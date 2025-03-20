@@ -452,11 +452,11 @@ class FastCRUD(
     }
 
     def __init__(
-        self,
-        model: type[ModelType],
-        is_deleted_column: str = "is_deleted",
-        deleted_at_column: str = "deleted_at",
-        updated_at_column: str = "updated_at",
+            self,
+            model: type[ModelType],
+            is_deleted_column: str = "is_deleted",
+            deleted_at_column: str = "deleted_at",
+            updated_at_column: str = "updated_at",
     ) -> None:
         self.model = model
         self.model_col_names = [col.key for col in model.__table__.columns]
@@ -466,9 +466,9 @@ class FastCRUD(
         self._primary_keys = _get_primary_keys(self.model)
 
     def _get_sqlalchemy_filter(
-        self,
-        operator: str,
-        value: Any,
+            self,
+            operator: str,
+            value: Any,
     ) -> Optional[Callable[[str], Callable]]:
         if operator in {"in", "not_in", "between"}:
             if not isinstance(value, (tuple, list, set)):
@@ -476,7 +476,7 @@ class FastCRUD(
         return self._SUPPORTED_FILTERS.get(operator)
 
     def _parse_filters(
-        self, model: Optional[Union[type[ModelType], AliasedClass]] = None, **kwargs
+            self, model: Optional[Union[type[ModelType], AliasedClass]] = None, **kwargs
     ) -> list[ColumnElement]:
         model = model or self.model
         filters = []
@@ -492,11 +492,11 @@ class FastCRUD(
                         sqlalchemy_filter(column)(or_value)
                         for or_key, or_value in value.items()
                         if (
-                            sqlalchemy_filter := self._get_sqlalchemy_filter(
-                                or_key, or_value
-                            )
-                        )
-                        is not None
+                               sqlalchemy_filter := self._get_sqlalchemy_filter(
+                                   or_key, or_value
+                               )
+                           )
+                           is not None
                     ]
                     filters.append(or_(*or_filters))
                 else:
@@ -515,10 +515,10 @@ class FastCRUD(
         return filters
 
     def _apply_sorting(
-        self,
-        stmt: Select,
-        sort_columns: Union[str, list[str]],
-        sort_orders: Optional[Union[str, list[str]]] = None,
+            self,
+            stmt: Select,
+            sort_columns: Union[str, list[str]],
+            sort_orders: Optional[Union[str, list[str]]] = None,
     ) -> Select:
         """
         Apply sorting to a SQLAlchemy query based on specified column names and sort orders.
@@ -590,10 +590,10 @@ class FastCRUD(
         return stmt
 
     def _prepare_and_apply_joins(
-        self,
-        stmt: Select,
-        joins_config: list[JoinConfig],
-        use_temporary_prefix: bool = False,
+            self,
+            stmt: Select,
+            joins_config: list[JoinConfig],
+            use_temporary_prefix: bool = False,
     ):
         """
         Applies joins to the given SQL statement based on a list of `JoinConfig` objects.
@@ -628,10 +628,19 @@ class FastCRUD(
             if joined_model_filters:
                 stmt = stmt.filter(*joined_model_filters)
 
+            if join.sort_columns:
+                for idx, column_name in enumerate(join.sort_columns):
+                    column = getattr(model, column_name, None)
+                    if not column:
+                        raise ArgumentError(f"Invalid column name: {column_name}")
+
+                    order = join.sort_orders[idx] if join.sort_orders else "asc"
+                    stmt = stmt.order_by(asc(column) if order == "asc" else desc(column))
+
         return stmt
 
     async def create(
-        self, db: AsyncSession, object: CreateSchemaType, commit: bool = True
+            self, db: AsyncSession, object: CreateSchemaType, commit: bool = True
     ) -> ModelType:
         """
         Create a new record in the database.
@@ -652,11 +661,11 @@ class FastCRUD(
         return db_object
 
     async def select(
-        self,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        sort_columns: Optional[Union[str, list[str]]] = None,
-        sort_orders: Optional[Union[str, list[str]]] = None,
-        **kwargs: Any,
+            self,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            sort_columns: Optional[Union[str, list[str]]] = None,
+            sort_orders: Optional[Union[str, list[str]]] = None,
+            **kwargs: Any,
     ) -> Select:
         """
         Constructs a SQL Alchemy `Select` statement with optional column selection, filtering, and sorting.
@@ -717,12 +726,12 @@ class FastCRUD(
         return stmt
 
     async def get(
-        self,
-        db: AsyncSession,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        return_as_model: bool = False,
-        one_or_none: bool = False,
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            return_as_model: bool = False,
+            one_or_none: bool = False,
+            **kwargs: Any,
     ) -> Optional[Union[dict, SelectSchemaType]]:
         """
         Fetches a single record based on specified filters.
@@ -788,11 +797,11 @@ class FastCRUD(
         return {pk.name: getattr(instance, pk.name) for pk in self._primary_keys}
 
     async def upsert(
-        self,
-        db: AsyncSession,
-        instance: Union[UpdateSchemaType, CreateSchemaType],
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        return_as_model: bool = False,
+            self,
+            db: AsyncSession,
+            instance: Union[UpdateSchemaType, CreateSchemaType],
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            return_as_model: bool = False,
     ) -> Union[SelectSchemaType, dict[str, Any], None]:
         """Update the instance or create it if it doesn't exists.
 
@@ -832,15 +841,15 @@ class FastCRUD(
         return db_instance
 
     async def upsert_multi(
-        self,
-        db: AsyncSession,
-        instances: list[Union[UpdateSchemaType, CreateSchemaType]],
-        commit: bool = False,
-        return_columns: Optional[list[str]] = None,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        return_as_model: bool = False,
-        update_override: Optional[dict[str, Any]] = None,
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            instances: list[Union[UpdateSchemaType, CreateSchemaType]],
+            commit: bool = False,
+            return_columns: Optional[list[str]] = None,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            return_as_model: bool = False,
+            update_override: Optional[dict[str, Any]] = None,
+            **kwargs: Any,
     ) -> Optional[dict[str, Any]]:
         """
         Upsert multiple records in the database. The underlying implementation varies based on the database dialect.
@@ -911,20 +920,20 @@ class FastCRUD(
         return None
 
     async def _upsert_multi_postgresql(
-        self,
-        instances: list[Union[UpdateSchemaType, CreateSchemaType]],
-        filters: list[ColumnElement],
-        update_set_override: dict[str, Any],
+            self,
+            instances: list[Union[UpdateSchemaType, CreateSchemaType]],
+            filters: list[ColumnElement],
+            update_set_override: dict[str, Any],
     ) -> tuple[Insert, list[dict]]:
         statement = postgresql.insert(self.model)
         statement = statement.on_conflict_do_update(
             index_elements=self._primary_keys,
             set_={
-                column.name: getattr(statement.excluded, column.name)
-                for column in self.model.__table__.columns
-                if not column.primary_key and not column.unique
-            }
-            | update_set_override,
+                     column.name: getattr(statement.excluded, column.name)
+                     for column in self.model.__table__.columns
+                     if not column.primary_key and not column.unique
+                 }
+                 | update_set_override,
             where=and_(*filters) if filters else None,
         )
         params = [
@@ -933,20 +942,20 @@ class FastCRUD(
         return statement, params
 
     async def _upsert_multi_sqlite(
-        self,
-        instances: list[Union[UpdateSchemaType, CreateSchemaType]],
-        filters: list[ColumnElement],
-        update_set_override: dict[str, Any],
+            self,
+            instances: list[Union[UpdateSchemaType, CreateSchemaType]],
+            filters: list[ColumnElement],
+            update_set_override: dict[str, Any],
     ) -> tuple[Insert, list[dict]]:
         statement = sqlite.insert(self.model)
         statement = statement.on_conflict_do_update(
             index_elements=self._primary_keys,
             set_={
-                column.name: getattr(statement.excluded, column.name)
-                for column in self.model.__table__.columns
-                if not column.primary_key and not column.unique
-            }
-            | update_set_override,
+                     column.name: getattr(statement.excluded, column.name)
+                     for column in self.model.__table__.columns
+                     if not column.primary_key and not column.unique
+                 }
+                 | update_set_override,
             where=and_(*filters) if filters else None,
         )
         params = [
@@ -955,9 +964,9 @@ class FastCRUD(
         return statement, params
 
     async def _upsert_multi_mysql(
-        self,
-        instances: list[Union[UpdateSchemaType, CreateSchemaType]],
-        update_set_override: dict[str, Any],
+            self,
+            instances: list[Union[UpdateSchemaType, CreateSchemaType]],
+            update_set_override: dict[str, Any],
     ) -> tuple[Insert, list[dict]]:
         statement = mysql.insert(self.model)
         statement = statement.on_duplicate_key_update(
@@ -965,11 +974,11 @@ class FastCRUD(
                 column.name: getattr(statement.inserted, column.name)
                 for column in self.model.__table__.columns
                 if not column.primary_key
-                and not column.unique
-                and column.name != self.deleted_at_column
+                   and not column.unique
+                   and column.name != self.deleted_at_column
             }
             | update_set_override,
-        )
+            )
         params = [
             self.model(**instance.model_dump()).__dict__ for instance in instances
         ]
@@ -1020,10 +1029,10 @@ class FastCRUD(
         return result.first() is not None
 
     async def count(
-        self,
-        db: AsyncSession,
-        joins_config: Optional[list[JoinConfig]] = None,
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            joins_config: Optional[list[JoinConfig]] = None,
+            **kwargs: Any,
     ) -> int:
         """
         Counts records that match specified filters.
@@ -1140,16 +1149,16 @@ class FastCRUD(
         return total_count
 
     async def get_multi(
-        self,
-        db: AsyncSession,
-        offset: int = 0,
-        limit: Optional[int] = 100,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        sort_columns: Optional[Union[str, list[str]]] = None,
-        sort_orders: Optional[Union[str, list[str]]] = None,
-        return_as_model: bool = False,
-        return_total_count: bool = True,
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            offset: int = 0,
+            limit: Optional[int] = 100,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            sort_columns: Optional[Union[str, list[str]]] = None,
+            sort_orders: Optional[Union[str, list[str]]] = None,
+            return_as_model: bool = False,
+            return_total_count: bool = True,
+            **kwargs: Any,
     ) -> Union[GetMultiResponseModel[SelectSchemaType], GetMultiResponseDict]:
         """
         Fetches multiple records based on filters, supporting sorting, pagination.
@@ -1288,20 +1297,20 @@ class FastCRUD(
         return response
 
     async def get_joined(
-        self,
-        db: AsyncSession,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        join_model: Optional[ModelType] = None,
-        join_on: Optional[Union[Join, BinaryExpression]] = None,
-        join_prefix: Optional[str] = None,
-        join_schema_to_select: Optional[type[SelectSchemaType]] = None,
-        join_type: str = "left",
-        alias: Optional[AliasedClass] = None,
-        join_filters: Optional[dict] = None,
-        joins_config: Optional[list[JoinConfig]] = None,
-        nest_joins: bool = False,
-        relationship_type: Optional[str] = None,
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            join_model: Optional[ModelType] = None,
+            join_on: Optional[Union[Join, BinaryExpression]] = None,
+            join_prefix: Optional[str] = None,
+            join_schema_to_select: Optional[type[SelectSchemaType]] = None,
+            join_type: str = "left",
+            alias: Optional[AliasedClass] = None,
+            join_filters: Optional[dict] = None,
+            joins_config: Optional[list[JoinConfig]] = None,
+            nest_joins: bool = False,
+            relationship_type: Optional[str] = None,
+            **kwargs: Any,
     ) -> Optional[dict[str, Any]]:
         """
         Fetches a single record with one or multiple joins on other models. If `join_on` is not provided, the method attempts
@@ -1538,7 +1547,7 @@ class FastCRUD(
             ```
         """
         if joins_config and (
-            join_model or join_prefix or join_on or join_schema_to_select or alias
+                join_model or join_prefix or join_on or join_schema_to_select or alias
         ):
             raise ValueError(
                 "Cannot use both single join parameters and joins_config simultaneously."
@@ -1604,26 +1613,26 @@ class FastCRUD(
         return None
 
     async def get_multi_joined(
-        self,
-        db: AsyncSession,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        join_model: Optional[type[ModelType]] = None,
-        join_on: Optional[Any] = None,
-        join_prefix: Optional[str] = None,
-        join_schema_to_select: Optional[type[SelectSchemaType]] = None,
-        join_type: str = "left",
-        alias: Optional[AliasedClass[Any]] = None,
-        join_filters: Optional[dict] = None,
-        nest_joins: bool = False,
-        offset: int = 0,
-        limit: Optional[int] = 100,
-        sort_columns: Optional[Union[str, list[str]]] = None,
-        sort_orders: Optional[Union[str, list[str]]] = None,
-        return_as_model: bool = False,
-        joins_config: Optional[list[JoinConfig]] = None,
-        return_total_count: bool = True,
-        relationship_type: Optional[str] = None,
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            join_model: Optional[type[ModelType]] = None,
+            join_on: Optional[Any] = None,
+            join_prefix: Optional[str] = None,
+            join_schema_to_select: Optional[type[SelectSchemaType]] = None,
+            join_type: str = "left",
+            alias: Optional[AliasedClass[Any]] = None,
+            join_filters: Optional[dict] = None,
+            nest_joins: bool = False,
+            offset: int = 0,
+            limit: Optional[int] = 100,
+            sort_columns: Optional[Union[str, list[str]]] = None,
+            sort_orders: Optional[Union[str, list[str]]] = None,
+            return_as_model: bool = False,
+            joins_config: Optional[list[JoinConfig]] = None,
+            return_total_count: bool = True,
+            relationship_type: Optional[str] = None,
+            **kwargs: Any,
     ) -> dict[str, Any]:
         """
         Fetch multiple records with a join on another model, allowing for pagination, optional sorting, and model conversion.
@@ -1893,12 +1902,12 @@ class FastCRUD(
             ```
         """
         if joins_config and (
-            join_model
-            or join_prefix
-            or join_on
-            or join_schema_to_select
-            or alias
-            or relationship_type
+                join_model
+                or join_prefix
+                or join_on
+                or join_schema_to_select
+                or alias
+                or relationship_type
         ):
             raise ValueError(
                 "Cannot use both single join parameters and joins_config simultaneously."
@@ -1981,7 +1990,7 @@ class FastCRUD(
                 data.append(row_dict)
 
         if nest_joins and any(
-            join.relationship_type == "one-to-many" for join in join_definitions
+                join.relationship_type == "one-to-many" for join in join_definitions
         ):
             nested_data = _nest_multi_join_data(
                 base_primary_key=self._primary_keys[0].name,  # type: ignore[misc]
@@ -2013,14 +2022,14 @@ class FastCRUD(
         return response
 
     async def get_multi_by_cursor(
-        self,
-        db: AsyncSession,
-        cursor: Any = None,
-        limit: int = 100,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        sort_column: str = "id",
-        sort_order: str = "asc",
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            cursor: Any = None,
+            limit: int = 100,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            sort_column: str = "id",
+            sort_order: str = "asc",
+            **kwargs: Any,
     ) -> dict[str, Any]:
         """
         Implements cursor-based pagination for fetching records. This method is designed for efficient data retrieval in large datasets and is ideal for features like infinite scrolling.
@@ -2121,16 +2130,16 @@ class FastCRUD(
         return {"data": data, "next_cursor": next_cursor}
 
     async def update(
-        self,
-        db: AsyncSession,
-        object: Union[UpdateSchemaType, dict[str, Any]],
-        allow_multiple: bool = False,
-        commit: bool = True,
-        return_columns: Optional[list[str]] = None,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        return_as_model: bool = False,
-        one_or_none: bool = False,
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            object: Union[UpdateSchemaType, dict[str, Any]],
+            allow_multiple: bool = False,
+            commit: bool = True,
+            return_columns: Optional[list[str]] = None,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            return_as_model: bool = False,
+            one_or_none: bool = False,
+            **kwargs: Any,
     ) -> Optional[Union[dict, SelectSchemaType]]:
         """
         Updates an existing record or multiple records in the database based on specified filters. This method allows for precise targeting of records to update.
@@ -2261,11 +2270,11 @@ class FastCRUD(
         return None
 
     def _as_single_response(
-        self,
-        db_row: Result,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        return_as_model: bool = False,
-        one_or_none: bool = False,
+            self,
+            db_row: Result,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            return_as_model: bool = False,
+            one_or_none: bool = False,
     ) -> Optional[Union[dict, SelectSchemaType]]:
         result: Optional[Row] = db_row.one_or_none() if one_or_none else db_row.first()
         if result is None:  # pragma: no cover
@@ -2280,10 +2289,10 @@ class FastCRUD(
         return schema_to_select(**out)
 
     def _as_multi_response(
-        self,
-        db_row: Result,
-        schema_to_select: Optional[type[SelectSchemaType]] = None,
-        return_as_model: bool = False,
+            self,
+            db_row: Result,
+            schema_to_select: Optional[type[SelectSchemaType]] = None,
+            return_as_model: bool = False,
     ) -> dict:
         data = [dict(row) for row in db_row.mappings()]
 
@@ -2305,11 +2314,11 @@ class FastCRUD(
         return response
 
     async def db_delete(
-        self,
-        db: AsyncSession,
-        allow_multiple: bool = False,
-        commit: bool = True,
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            allow_multiple: bool = False,
+            commit: bool = True,
+            **kwargs: Any,
     ) -> None:
         """
         Deletes a record or multiple records from the database based on specified filters.
@@ -2367,12 +2376,12 @@ class FastCRUD(
             await db.commit()
 
     async def delete(
-        self,
-        db: AsyncSession,
-        db_row: Optional[Row] = None,
-        allow_multiple: bool = False,
-        commit: bool = True,
-        **kwargs: Any,
+            self,
+            db: AsyncSession,
+            db_row: Optional[Row] = None,
+            allow_multiple: bool = False,
+            commit: bool = True,
+            **kwargs: Any,
     ) -> None:
         """
         Soft deletes a record or optionally multiple records if it has an `"is_deleted"` attribute, otherwise performs a hard delete, based on specified filters.
@@ -2423,7 +2432,7 @@ class FastCRUD(
         filters = self._parse_filters(**kwargs)
         if db_row:
             if hasattr(db_row, self.is_deleted_column) and hasattr(
-                db_row, self.deleted_at_column
+                    db_row, self.deleted_at_column
             ):
                 setattr(db_row, self.is_deleted_column, True)
                 setattr(db_row, self.deleted_at_column, datetime.now(timezone.utc))

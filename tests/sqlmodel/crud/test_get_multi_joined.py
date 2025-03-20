@@ -152,7 +152,7 @@ async def test_get_multi_joined_filtering(async_session, test_data, test_data_ti
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_different_join_types(
-    async_session, test_data, test_data_tier
+        async_session, test_data, test_data_tier
 ):
     for tier_item in test_data_tier:
         async_session.add(TierModel(**tier_item))
@@ -252,7 +252,7 @@ async def test_get_multi_joined_large_offset(async_session, test_data, test_data
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_invalid_limit_offset(
-    async_session, test_data, test_data_tier
+        async_session, test_data, test_data_tier
 ):
     for tier_item in test_data_tier:
         async_session.add(TierModel(**tier_item))
@@ -285,7 +285,7 @@ async def test_get_multi_joined_invalid_limit_offset(
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_advanced_filtering(
-    async_session, test_data, test_data_tier
+        async_session, test_data, test_data_tier
 ):
     for tier_item in test_data_tier:
         async_session.add(TierModel(**tier_item))
@@ -308,7 +308,7 @@ async def test_get_multi_joined_advanced_filtering(
     )
 
     assert (
-        len(advanced_filter_result["data"]) > 0
+            len(advanced_filter_result["data"]) > 0
     ), "Should fetch records with ID greater than 5"
     assert all(
         item["id"] > 5 for item in advanced_filter_result["data"]
@@ -317,7 +317,7 @@ async def test_get_multi_joined_advanced_filtering(
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_with_additional_join_model(
-    async_session, test_data, test_data_tier, test_data_category
+        async_session, test_data, test_data_tier, test_data_category
 ):
     for category_item in test_data_category:
         async_session.add(CategoryModel(**category_item))
@@ -364,7 +364,7 @@ async def test_get_multi_joined_with_additional_join_model(
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_with_aliases(
-    async_session, test_data, test_data_tier, test_data_category, test_data_booking
+        async_session, test_data, test_data_tier, test_data_category, test_data_booking
 ):
     for tier_item in test_data_tier:
         async_session.add(TierModel(**tier_item))
@@ -414,25 +414,25 @@ async def test_get_multi_joined_with_aliases(
     ), "The result should have a 'data' key with a list of records."
     for booking in result["data"]:
         assert (
-            "owner_name" in booking
+                "owner_name" in booking
         ), "Each record should include 'owner_name' from the joined owner ModelTest data."
         assert (
-            "user_name" in booking
+                "user_name" in booking
         ), "Each record should include 'user_name' from the joined user ModelTest data."
     assert result is not None
     assert result["total_count"] >= 1, "Expected at least one booking record"
     first_result = result["data"][0]
     assert (
-        first_result["owner_name"] == expected_owner_name
+            first_result["owner_name"] == expected_owner_name
     ), "Owner name does not match expected value"
     assert (
-        first_result["user_name"] == expected_user_name
+            first_result["user_name"] == expected_user_name
     ), "User name does not match expected value"
 
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_with_aliases_no_schema(
-    async_session, test_data, test_data_tier, test_data_category, test_data_booking
+        async_session, test_data, test_data_tier, test_data_category, test_data_booking
 ):
     for tier_item in test_data_tier:
         async_session.add(TierModel(**tier_item))
@@ -480,19 +480,19 @@ async def test_get_multi_joined_with_aliases_no_schema(
     ), "The result should have a 'data' key with a list of records."
     for booking in result["data"]:
         assert (
-            "owner_name" in booking
+                "owner_name" in booking
         ), "Each record should include 'owner_name' from the joined owner ModelTest data."
         assert (
-            "user_name" in booking
+                "user_name" in booking
         ), "Each record should include 'user_name' from the joined user ModelTest data."
     assert result is not None
     assert result["total_count"] >= 1, "Expected at least one booking record"
     first_result = result["data"][0]
     assert (
-        first_result["owner_name"] == expected_owner_name
+            first_result["owner_name"] == expected_owner_name
     ), "Owner name does not match expected value"
     assert (
-        first_result["user_name"] == expected_user_name
+            first_result["user_name"] == expected_user_name
     ), "User name does not match expected value"
 
 
@@ -570,21 +570,21 @@ async def test_many_to_many_joined(async_session):
 
     assert len(records["data"]) == 3, "Expected three project-participant associations"
     assert (
-        len(records["data"]) == records["total_count"]
+            len(records["data"]) == records["total_count"]
     ), "Number of records should be the same in total_count and len"
 
     for expected, actual in zip(expected_results, records["data"]):
         assert (
-            actual["id"] == expected["project_id"]
+                actual["id"] == expected["project_id"]
         ), f"Project ID mismatch. Expected: {expected['project_id']}, Got: {actual['id']}"
         assert (
-            actual["participant_id"] == expected["participant_id"]
+                actual["participant_id"] == expected["participant_id"]
         ), f"Participant ID mismatch. Expected: {expected['participant_id']}, Got: {actual['participant_id']}"
         assert (
-            actual["participant_name"] == expected["participant_name"]
+                actual["participant_name"] == expected["participant_name"]
         ), f"Participant name mismatch. Expected: {expected['participant_name']}, Got: {actual['participant_name']}"
         assert (
-            actual["participant_role"] == expected["participant_role"]
+                actual["participant_role"] == expected["participant_role"]
         ), f"Participant role mismatch. Expected: {expected['participant_role']}, Got: {actual['participant_role']}"
 
 
@@ -600,8 +600,8 @@ async def test_get_multi_joined_conflicting_join_parameters(async_session):
             ],
         )
     assert (
-        "Cannot use both single join parameters and joins_config simultaneously"
-        in str(exc_info.value)
+            "Cannot use both single join parameters and joins_config simultaneously"
+            in str(exc_info.value)
     )
 
 
@@ -627,7 +627,7 @@ async def test_get_multi_joined_unsupported_join_type(async_session, test_data):
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_with_joined_model_filters(
-    async_session, test_data, test_data_tier
+        async_session, test_data, test_data_tier
 ):
     for tier_data in test_data_tier:
         async_session.add(TierModel(**tier_data))
@@ -651,11 +651,11 @@ async def test_get_multi_joined_with_joined_model_filters(
     )
 
     assert (
-        len(result["data"]) > 0
+            len(result["data"]) > 0
     ), "Expected to find at least one ModelTest record associated with the 'Premium' tier."
     for item in result["data"]:
         assert (
-            item["tier_name"] == "Premium"
+                item["tier_name"] == "Premium"
         ), "Expected tier_name to be 'Premium' for all fetched records."
 
 
@@ -679,7 +679,7 @@ async def test_get_multi_joined_missing_schema_to_select(async_session, test_dat
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_validation_error(
-    async_session, test_data, test_model, test_data_tier
+        async_session, test_data, test_model, test_data_tier
 ):
     for tier_data in test_data_tier:
         async_session.add(TierModel(**tier_data))
@@ -754,7 +754,7 @@ async def test_get_multi_joined_with_nesting(async_session, test_data, test_data
         for item in result["data"]:
             assert "tier" in item, "Nested tier data should be present under key 'tier'"
             assert (
-                "category" in item
+                    "category" in item
             ), "Nested category data should be present under key 'category'"
             assert item["tier"] is None or isinstance(
                 item["tier"], dict
@@ -764,17 +764,17 @@ async def test_get_multi_joined_with_nesting(async_session, test_data, test_data
             ), "Nested category data should be a dictionary"
             if item["tier"] is not None:
                 assert (
-                    "tier_" not in item["tier"]
+                        "tier_" not in item["tier"]
                 ), "No prefix should be present in the nested tier keys"
             if item["category"] is not None:  # pragma: no cover
                 assert (
-                    "category_" not in item["category"]
+                        "category_" not in item["category"]
                 ), "No prefix should be present in the nested category keys"
 
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_no_prefix_regular(
-    async_session, test_data, test_data_tier
+        async_session, test_data, test_data_tier
 ):
     for tier_item in test_data_tier:
         async_session.add(TierModel(**tier_item))
@@ -802,7 +802,7 @@ async def test_get_multi_joined_no_prefix_regular(
 
 @pytest.mark.asyncio
 async def test_get_multi_joined_no_prefix_nested(
-    async_session, test_data, test_data_tier
+        async_session, test_data, test_data_tier
 ):
     for tier_item in test_data_tier:
         async_session.add(TierModel(**tier_item))
@@ -827,10 +827,10 @@ async def test_get_multi_joined_no_prefix_nested(
     for item in result["data"]:
         assert "name" in item, "Expected user name in each item."
         assert (
-            TierModel.__tablename__ in item
+                TierModel.__tablename__ in item
         ), f"Expected nested '{TierModel.__tablename__}' key in each item."
         assert (
-            "name" in item[TierModel.__tablename__]
+                "name" in item[TierModel.__tablename__]
         ), f"Expected 'name' field inside nested '{TierModel.__tablename__}' dictionary."
 
 
@@ -879,26 +879,26 @@ async def test_get_multi_joined_card_with_articles(async_session):
     card3 = next((c for c in data if c["id"] == cards[2].id), None)
 
     assert (
-        card1 is not None and "articles" in card1
+            card1 is not None and "articles" in card1
     ), "Card 1 should have nested articles."
     assert len(card1["articles"]) == 1, "Card 1 should have one article."
     assert (
-        card1["articles"][0]["title"] == "Article 1"
+            card1["articles"][0]["title"] == "Article 1"
     ), "Card 1's article title should be 'Article 1'."
 
     assert (
-        card2 is not None and "articles" in card2
+            card2 is not None and "articles" in card2
     ), "Card 2 should have nested articles."
     assert len(card2["articles"]) == 2, "Card 2 should have two articles."
     assert (
-        card2["articles"][0]["title"] == "Article 2"
+            card2["articles"][0]["title"] == "Article 2"
     ), "Card 2's first article title should be 'Article 2'."
     assert (
-        card2["articles"][1]["title"] == "Article 3"
+            card2["articles"][1]["title"] == "Article 3"
     ), "Card 2's second article title should be 'Article 3'."
 
     assert (
-        card3 is not None and "articles" in card3
+            card3 is not None and "articles" in card3
     ), "Card 3 should have nested articles."
     assert len(card3["articles"]) == 0, "Card 3 should have no articles."
 
@@ -952,37 +952,37 @@ async def test_get_multi_joined_card_with_multiple_articles(async_session):
     card_d = next((c for c in data if c["id"] == cards[3].id), None)
 
     assert (
-        card_a is not None and "articles" in card_a
+            card_a is not None and "articles" in card_a
     ), "Card A should have nested articles."
     assert len(card_a["articles"]) == 2, "Card A should have two articles."
     assert (
-        card_a["articles"][0]["title"] == "Article 1"
+            card_a["articles"][0]["title"] == "Article 1"
     ), "Card A's first article title should be 'Article 1'."
     assert (
-        card_a["articles"][1]["title"] == "Article 2"
+            card_a["articles"][1]["title"] == "Article 2"
     ), "Card A's second article title should be 'Article 2'."
 
     assert (
-        card_b is not None and "articles" in card_b
+            card_b is not None and "articles" in card_b
     ), "Card B should have nested articles."
     assert len(card_b["articles"]) == 2, "Card B should have two articles."
     assert (
-        card_b["articles"][0]["title"] == "Article 3"
+            card_b["articles"][0]["title"] == "Article 3"
     ), "Card B's first article title should be 'Article 3'."
     assert (
-        card_b["articles"][1]["title"] == "Article 4"
+            card_b["articles"][1]["title"] == "Article 4"
     ), "Card B's second article title should be 'Article 4'."
 
     assert (
-        card_c is not None and "articles" in card_c
+            card_c is not None and "articles" in card_c
     ), "Card C should have nested articles."
     assert len(card_c["articles"]) == 1, "Card C should have one article."
     assert (
-        card_c["articles"][0]["title"] == "Article 5"
+            card_c["articles"][0]["title"] == "Article 5"
     ), "Card C's article title should be 'Article 5'."
 
     assert (
-        card_d is not None and "articles" in card_d
+            card_d is not None and "articles" in card_d
     ), "Card D should have nested articles."
     assert len(card_d["articles"]) == 0, "Card D should have no articles."
 
@@ -1046,10 +1046,10 @@ async def test_get_multi_joined_card_with_multiple_articles_as_models(async_sess
     ), "Card A should have nested articles."
     assert len(card_a.articles) == 2, "Card A should have two articles."
     assert (
-        card_a.articles[0].title == "Article 1"
+            card_a.articles[0].title == "Article 1"
     ), "Card A's first article title should be 'Article 1'."
     assert (
-        card_a.articles[1].title == "Article 2"
+            card_a.articles[1].title == "Article 2"
     ), "Card A's second article title should be 'Article 2'."
     assert all(
         isinstance(article, ArticleSchema) for article in card_a.articles
@@ -1060,10 +1060,10 @@ async def test_get_multi_joined_card_with_multiple_articles_as_models(async_sess
     ), "Card B should have nested articles."
     assert len(card_b.articles) == 2, "Card B should have two articles."
     assert (
-        card_b.articles[0].title == "Article 3"
+            card_b.articles[0].title == "Article 3"
     ), "Card B's first article title should be 'Article 3'."
     assert (
-        card_b.articles[1].title == "Article 4"
+            card_b.articles[1].title == "Article 4"
     ), "Card B's second article title should be 'Article 4'."
     assert all(
         isinstance(article, ArticleSchema) for article in card_b.articles
@@ -1074,7 +1074,7 @@ async def test_get_multi_joined_card_with_multiple_articles_as_models(async_sess
     ), "Card C should have nested articles."
     assert len(card_c.articles) == 1, "Card C should have one article."
     assert (
-        card_c.articles[0].title == "Article 5"
+            card_c.articles[0].title == "Article 5"
     ), "Card C's article title should be 'Article 5'."
     assert all(
         isinstance(article, ArticleSchema) for article in card_c.articles
@@ -1351,11 +1351,197 @@ async def test_get_multi_joined_explicit_join_preserves_condition(async_session)
     assert task3["assignee"] is None, "Task 3 should have no assignee"
 
     assert (
-        task1["department"]["name"] == "Engineering"
+            task1["department"]["name"] == "Engineering"
     ), "Task 1 should be in Engineering department"
     assert (
-        task2["department"]["name"] == "Engineering"
+            task2["department"]["name"] == "Engineering"
     ), "Task 2 should be in Engineering department"
     assert (
-        task3["department"]["name"] == "Engineering"
+            task3["department"]["name"] == "Engineering"
     ), "Task 3 should be in Engineering department"
+
+
+@pytest.mark.asyncio
+async def test_get_multi_joined_sorting_nested_items_one_to_many(async_session):
+    cards = [
+        Card(title="Card A"),
+        Card(title="Card B"),
+        Card(title="Card C"),
+    ]
+    async_session.add_all(cards)
+    await async_session.flush()
+
+    articles = [
+        Article(title="Article 3", card_id=cards[0].id),
+        Article(title="Article 1", card_id=cards[0].id),
+        Article(title="Article 2", card_id=cards[0].id),
+        Article(title="Article 6", card_id=cards[1].id),
+        Article(title="Article 5", card_id=cards[1].id),
+        Article(title="Article 4", card_id=cards[1].id),
+    ]
+    async_session.add_all(articles)
+    await async_session.commit()
+
+    card_crud = FastCRUD(Card)
+
+    result = await card_crud.get_multi_joined(
+        db=async_session,
+        nest_joins=True,
+        joins_config=[
+            JoinConfig(
+                model=Article,
+                join_on=Article.card_id == Card.id,
+                join_prefix="articles_",
+                join_type="left",
+                relationship_type="one-to-many",
+                sort_columns=["title"],
+                sort_orders=["asc"],
+            )
+        ],
+    )
+
+    assert result is not None, "No data returned from the database."
+    assert "data" in result, "Result should contain 'data' key."
+    data = result["data"]
+    assert isinstance(data, list), "Result data should be a list."
+    assert len(data) == 3, "Expected three card records."
+
+    card_a = next((c for c in data if c["id"] == cards[0].id), None)
+    card_b = next((c for c in data if c["id"] == cards[1].id), None)
+    card_c = next((c for c in data if c["id"] == cards[2].id), None)
+
+    assert (
+            card_a is not None and "articles" in card_a
+    ), "Card A should have nested articles."
+    assert len(card_a["articles"]) == 3, "Card A should have three articles."
+    assert (
+            card_a["articles"][0]["title"] == "Article 1"
+    ), "Card A's first article title should be 'Article 1'."
+    assert (
+            card_a["articles"][1]["title"] == "Article 2"
+    ), "Card A's second article title should be 'Article 2'."
+    assert (
+            card_a["articles"][2]["title"] == "Article 3"
+    ), "Card A's third article title should be 'Article 3'."
+
+    assert (
+            card_b is not None and "articles" in card_b
+    ), "Card B should have nested articles."
+    assert len(card_b["articles"]) == 3, "Card B should have three articles."
+    assert (
+            card_b["articles"][0]["title"] == "Article 4"
+    ), "Card B's first article title should be 'Article 4'."
+    assert (
+            card_b["articles"][1]["title"] == "Article 5"
+    ), "Card B's second article title should be 'Article 5'."
+    assert (
+            card_b["articles"][2]["title"] == "Article 6"
+    ), "Card B's third article title should be 'Article 6'."
+
+    assert (
+            card_c is not None and "articles" in card_c
+    ), "Card C should have nested articles."
+    assert len(card_c["articles"]) == 0, "Card C should have no articles."
+
+
+@pytest.mark.asyncio
+async def test_get_multi_joined_sorting_nested_items_many_to_many(async_session):
+    project1 = Project(id=1, name="Project 1", description="First Project")
+    project2 = Project(id=2, name="Project 2", description="Second Project")
+
+    participant1 = Participant(id=1, name="Participant 3", role="Developer")
+    participant2 = Participant(id=2, name="Participant 1", role="Designer")
+    participant3 = Participant(id=3, name="Participant 2", role="Manager")
+
+    async_session.add_all([project1, project2, participant1, participant2, participant3])
+    await async_session.commit()
+
+    projects_participants1 = ProjectsParticipantsAssociation(
+        project_id=1, participant_id=1
+    )
+    projects_participants2 = ProjectsParticipantsAssociation(
+        project_id=1, participant_id=2
+    )
+    projects_participants3 = ProjectsParticipantsAssociation(
+        project_id=1, participant_id=3
+    )
+    projects_participants4 = ProjectsParticipantsAssociation(
+        project_id=2, participant_id=1
+    )
+    projects_participants5 = ProjectsParticipantsAssociation(
+        project_id=2, participant_id=2
+    )
+
+    async_session.add_all(
+        [
+            projects_participants1,
+            projects_participants2,
+            projects_participants3,
+            projects_participants4,
+            projects_participants5,
+        ]
+    )
+    await async_session.commit()
+
+    crud_project = FastCRUD(Project)
+
+    join_condition_1 = Project.id == ProjectsParticipantsAssociation.project_id
+    join_condition_2 = ProjectsParticipantsAssociation.participant_id == Participant.id
+
+    joins_config = [
+        JoinConfig(
+            model=ProjectsParticipantsAssociation,
+            join_on=join_condition_1,
+            join_type="inner",
+            join_prefix="pp_",
+        ),
+        JoinConfig(
+            model=Participant,
+            join_on=join_condition_2,
+            join_type="inner",
+            join_prefix="participant_",
+            relationship_type="one-to-many",
+            sort_columns=["name"],
+            sort_orders=["asc"],
+        ),
+    ]
+
+    records = await crud_project.get_multi_joined(
+        db=async_session,
+        nest_joins=True,
+        joins_config=joins_config,
+    )
+
+    assert records is not None, "No data returned from the database."
+    assert "data" in records, "Result should contain 'data' key."
+    data = records["data"]
+    assert isinstance(data, list), "Result data should be a list."
+    assert len(data) == 2, "Expected two project records."
+
+    project_1 = next((p for p in data if p["id"] == project1.id), None)
+    project_2 = next((p for p in data if p["id"] == project2.id), None)
+
+    assert (
+            project_1 is not None and "participants" in project_1
+    ), "Project 1 should have nested participants."
+    assert len(project_1["participants"]) == 3, "Project 1 should have three participants."
+    assert (
+            project_1["participants"][0]["name"] == "Participant 1"
+    ), "Project 1's first participant name should be 'Participant 1'."
+    assert (
+            project_1["participants"][1]["name"] == "Participant 2"
+    ), "Project 1's second participant name should be 'Participant 2'."
+    assert (
+            project_1["participants"][2]["name"] == "Participant 3"
+    ), "Project 1's third participant name should be 'Participant 3'."
+
+    assert (
+            project_2 is not None and "participants" in project_2
+    ), "Project 2 should have nested participants."
+    assert len(project_2["participants"]) == 2, "Project 2 should have two participants."
+    assert (
+            project_2["participants"][0]["name"] == "Participant 1"
+    ), "Project 2's first participant name should be 'Participant 1'."
+    assert (
+            project_2["participants"][1]["name"] == "Participant 2"
+    ), "Project 2's second participant name should be 'Participant 2'."

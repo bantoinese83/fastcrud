@@ -20,6 +20,8 @@ class JoinConfig(BaseModel):
     alias: Optional[AliasedClass] = None
     filters: Optional[dict] = None
     relationship_type: Optional[str] = "one-to-one"
+    sort_columns: Optional[Union[str, list[str]]] = None
+    sort_orders: Optional[Union[str, list[str]]] = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -37,14 +39,34 @@ class JoinConfig(BaseModel):
             raise ValueError(f"Unsupported join type: {value}")
         return value
 
+    @field_validator("sort_columns")
+    def check_valid_sort_columns(cls, value):
+        if value is not None and not isinstance(value, (str, list)):
+            raise ValueError("sort_columns must be a string or a list of strings")
+        return value
+
+    @field_validator("sort_orders")
+    def check_valid_sort_orders(cls, value):
+        if value is not None:
+            if isinstance(value, str):
+                if value not in ["asc", "desc"]:
+                    raise ValueError("Invalid sort order: {value}. Only 'asc' or 'desc' are allowed.")
+            elif isinstance(value, list):
+                for order in value:
+                    if order not in ["asc", "desc"]:
+                        raise ValueError("Invalid sort order: {order}. Only 'asc' or 'desc' are allowed.")
+            else:
+                raise ValueError("sort_orders must be a string or a list of strings")
+        return value
+
 
 def _extract_matching_columns_from_schema(
-    model: Union[ModelType, AliasedClass],
-    schema: Optional[type[SelectSchemaType]],
-    prefix: Optional[str] = None,
-    alias: Optional[AliasedClass] = None,
-    use_temporary_prefix: Optional[bool] = False,
-    temp_prefix: Optional[str] = "joined__",
+        model: Union[ModelType, AliasedClass],
+        schema: Optional[type[SelectSchemaType]],
+        prefix: Optional[str] = None,
+        alias: Optional[AliasedClass] = None,
+        use_temporary_prefix: Optional[bool] = False,
+        temp_prefix: Optional[str] = "joined__",
 ) -> list[Any]:
     """
     Retrieves a list of ORM column objects from a SQLAlchemy model that match the field names in a given Pydantic schema,
@@ -103,8 +125,8 @@ def _extract_matching_columns_from_schema(
 
 
 def _auto_detect_join_condition(
-    base_model: ModelType,
-    join_model: ModelType,
+        base_model: ModelType,
+        join_model: ModelType,
 ) -> Optional[ColumnElement]:
     """
     Automatically detects the join condition for SQLAlchemy models based on foreign key relationships.
@@ -138,7 +160,7 @@ def _auto_detect_join_condition(
                     ColumnElement,
                     base_model.__table__.c[col.name]
                     == join_model.__table__.c[list(col.foreign_keys)[0].column.name],
-                )
+                    )
                 for col in fk_columns
                 if list(col.foreign_keys)[0].column.table == join_model.__table__
             ),
@@ -290,10 +312,10 @@ def _handle_one_to_many(nested_data, nested_key, nested_field, value):
 
 
 def _nest_join_data(
-    data: dict,
-    join_definitions: list[JoinConfig],
-    temp_prefix: str = "joined__",
-    nested_data: Optional[dict[str, Any]] = None,
+        data: dict,
+        join_definitions: list[JoinConfig],
+        temp_prefix: str = "joined__",
+        nested_data: Optional[dict[str, Any]] = None,
 ) -> dict:
     """
     Nests joined data based on join definitions provided. This function processes the input `data` dictionary, identifying keys
@@ -429,14 +451,14 @@ def _nest_join_data(
         if join.relationship_type == "one-to-many" and nested_key in nested_data:
             if isinstance(nested_data.get(nested_key, []), list):
                 if any(
-                    item[join_primary_key] is None for item in nested_data[nested_key]
+                        item[join_primary_key] is None for item in nested_data[nested_key]
                 ):
                     nested_data[nested_key] = []
 
         if nested_key in nested_data and isinstance(nested_data[nested_key], dict):
             if (
-                join_primary_key in nested_data[nested_key]
-                and nested_data[nested_key][join_primary_key] is None
+                    join_primary_key in nested_data[nested_key]
+                    and nested_data[nested_key][join_primary_key] is None
             ):
                 nested_data[nested_key] = None
 
@@ -445,12 +467,12 @@ def _nest_join_data(
 
 
 def _nest_multi_join_data(
-    base_primary_key: str,
-    data: Sequence[Union[dict, BaseModel]],
-    joins_config: Sequence[JoinConfig],
-    return_as_model: bool = False,
-    schema_to_select: Optional[type[SelectSchemaType]] = None,
-    nested_schema_to_select: Optional[dict[str, type[SelectSchemaType]]] = None,
+        base_primary_key: str,
+        data: Sequence[Union[dict, BaseModel]],
+        joins_config: Sequence[JoinConfig],
+        return_as_model: bool = False,
+        schema_to_select: Optional[type[SelectSchemaType]] = None,
+        nested_schema_to_select: Optional[dict[str, type[SelectSchemaType]]] = None,
 ) -> Sequence[Union[dict, SelectSchemaType]]:
     """
     Nests joined data based on join definitions provided for multiple records. This function processes the input list of
@@ -560,7 +582,7 @@ def _nest_multi_join_data(
                     value = row_dict[join_prefix]
                     if isinstance(value, list):
                         if any(
-                            item[join_primary_key] is None for item in value
+                                item[join_primary_key] is None for item in value
                         ):  # pragma: no cover
                             pre_nested_data[primary_key_value][join_prefix] = []
                         else:
@@ -617,8 +639,8 @@ def _nest_multi_join_data(
 
 
 def _handle_null_primary_key_multi_join(
-    data: list[Union[dict[str, Any], SelectSchemaType]],
-    join_definitions: list[JoinConfig],
+        data: list[Union[dict[str, Any], SelectSchemaType]],
+        join_definitions: list[JoinConfig],
 ) -> list[Union[dict[str, Any], SelectSchemaType]]:
     for item in data:
         item_dict = item if isinstance(item, dict) else item.model_dump()
@@ -635,8 +657,8 @@ def _handle_null_primary_key_multi_join(
                 primary_key = join_primary_key
                 if join_primary_key:
                     if (
-                        primary_key in item_dict[nested_key]
-                        and item_dict[nested_key][primary_key] is None
+                            primary_key in item_dict[nested_key]
+                            and item_dict[nested_key][primary_key] is None
                     ):  # pragma: no cover
                         item_dict[nested_key] = None
 
